@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 public class Main {
-    private static String OUTPUTPATH="D:\\FunctionTest";
+    private static String OUTPUTPATH="E:\\FunctionTest";
 
     private static String[] functionName = {
             "f1",	                    	    //f1
@@ -73,8 +73,8 @@ public class Main {
 
     };
     private static String[] algorithmName = {
-            "PSO",						//0
-//		"HRA",						//4
+     //       "PSO",						//0
+		"HRO",						//4
 //		"GA",
 //		"CS",
 //		"WWO",						//水波算法
@@ -86,7 +86,7 @@ public class Main {
             30
     };
 
-    private static int[] sizeValue = {
+    private static int[] sizeValue = {//种群大小
 //			20,
 //			40,
             60,
@@ -96,28 +96,16 @@ public class Main {
 //			150,
     };
 
-    private static int[] iterValue = {
+    private static int[] iterValue = {//迭代次数
 //			5000,
 //			10000,
-            20000,
-//			100000
+            500,
+//			1000
     };
-    private static int numValue = 50;
+    private static int numValue = 50;//50 independent runs
     private static int currentNum=0;
     private static StringBuilder proData = new StringBuilder("");
     private static int futureTaskNum=3;//设置线程数
-
-    /**
-     * 将date转换成yyyy-MM-dd HH:mm:ss
-     * @param date
-     * @return
-     */
-    public static String dateToYYMMDDHHmmss(Date date){
-        String dateStr="";
-        SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-        dateStr=df.format(date);
-        return dateStr;
-    }
     public static void main(String[] arg0) throws InterruptedException, ExecutionException {
         OUTPUTPATH+= File.separator+dateToYYMMDDHHmmss(new Date())+File.separator;
 
@@ -165,7 +153,7 @@ public class Main {
                                 File file = new File(
                                         algorithmFolderPath
                                                 + fileName);
-                                System.out.println("name:"
+                                System.out.println("当前在写的文件为:"
                                         + file.getAbsolutePath());
                                 // if file doesnt exists, then create it
                                 if (!file.exists()) {
@@ -175,7 +163,7 @@ public class Main {
                                         file.getAbsoluteFile());
                                 BufferedWriter bw = new BufferedWriter(fw);
                                 List<FutureTask<StringBuffer>> futureTasks = new ArrayList<FutureTask<StringBuffer>>();
-                                //线程池 初始化十个线程 和JDBC连接池是一个意思 实现重用
+                                //
                                 ExecutorService executorService = Executors.newFixedThreadPool(futureTaskNum);
 
                                 Callable<StringBuffer> callable = new Callable<StringBuffer>() {
@@ -191,10 +179,10 @@ public class Main {
                                                 function);
                                     }
                                 };
-                                for (int n = 0; n < numValue; n++) {
+                                for (int n = 0; n < numValue; n++) {//50 independent runs
                                     FutureTask<StringBuffer> futureTask = new FutureTask<StringBuffer>(callable);
                                     futureTasks.add(futureTask);
-                                    //提交异步任务到线程池，让线程池管理任务 特爽把。
+                                    //提交异步任务到线程池，让线程池管理任务。
                                     //由于是异步并行任务，所以这里并不会阻塞
                                     executorService.submit(futureTask);
                                 }
@@ -202,7 +190,7 @@ public class Main {
                                 for (FutureTask<StringBuffer> futureTask : futureTasks) {
                                     //futureTask.get() 得到我们想要的结果
                                     //该方法有一个重载get(long timeout, TimeUnit unit) 第一个参数为最大等待时间，第二个为时间的单位
-                                    bw.write(futureTask.get().toString());
+                                    bw.write(futureTask.get().toString());//写入CSV文件
                                 }
                                 bw.close();
                                 executorService.shutdown();
@@ -238,6 +226,19 @@ public class Main {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 将date转换成yyyy-MM-dd HH:mm:ss
+     * @param date
+     * @return
+     */
+    public static String dateToYYMMDDHHmmss(Date date){
+        String dateStr="";
+        SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+        dateStr=df.format(date);
+        return dateStr;
+    }
+
 
     private static double[] calValue(String path) {
         BufferedReader reader;
@@ -357,17 +358,17 @@ public class Main {
         algorithm.run();
 //		double[] position =algorithm.getBestPosition();
         long endMili = System.currentTimeMillis();
-        double[] wholeValue = algorithm.getWholeValue();
+        double[] wholeValue = algorithm.getWholeValue();//每一次迭代的最优结果都获得到（convergence curve）
 //		double bestValue = algorithm.getBestValue();
         data .append( wholeValue[0]);
-        for (int i = 1; i < wholeValue.length; i++) {
+        for (int i = 1; i < wholeValue.length; i++) {//curve500个值都添加到data里面去
             data .append( ",");
             data .append( wholeValue[i]);
         }
         data .append( "," + (endMili - startMili));
         data .append( "\n");
         System.out.println(currentNum+":总耗时为：" + (endMili - startMili) + "毫秒");
-        currentNum++;
+        currentNum++;//进行下一次independent run
         return data;
     }
 

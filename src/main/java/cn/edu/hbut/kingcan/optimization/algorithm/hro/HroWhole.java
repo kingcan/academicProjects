@@ -5,7 +5,6 @@ import cn.edu.hbut.kingcan.config.frame.Algorithm;
 import cn.edu.hbut.kingcan.config.frame.Unit;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
 public class HroWhole extends Algorithm {
     protected    int                        dim;//维度
@@ -26,7 +25,7 @@ public class HroWhole extends Algorithm {
     private      int						tempTimes=0;
     private 	 double            			delta=0.0002d;
 
-    public HroWhole(int dim,int size,int iter,double min,double max){
+    public HroWhole(int dim, int size, int iter, double min, double max){
         this.dim=dim;
         this.size=size;
         this.iter=iter;
@@ -42,7 +41,7 @@ public class HroWhole extends Algorithm {
         positionBest=new double[dim];
         wholeValue=new double[iter];
     }
-    public HroWhole(int dim,int size,int iter,Range[]ranges){
+    HroWhole(int dim,int size,int iter,Range[]ranges){
         this.dim=dim;
         this.size=size;
         this.iter=iter;
@@ -295,18 +294,4 @@ public class HroWhole extends Algorithm {
     }
 }
 
-// 比较器(保持系都是)
-class MyComprator implements Comparator {
-    public int compare(Object arg0, Object arg1) {
-        HroUnit t1 = (HroUnit) arg0;
-        HroUnit t2 = (HroUnit) arg1;
-        if (t1.getValue() < t2.getValue()) {
-            return 1;
-        } else if (t1.getValue() == t2.getValue()) {
-            return 0;
-        } else {
-            return -1;
-        }
-        // return t1.getValue()<t2.getValue()? 1:-1;
-    }
-}
+
